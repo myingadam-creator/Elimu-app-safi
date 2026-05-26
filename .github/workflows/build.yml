@@ -26,28 +26,18 @@ jobs:
           sudo apt install -y git zip unzip python3-pip autoconf libtool pkg-config zlib1g-dev libncurses5-dev libncursesw5-dev cmake libffi-dev libssl-dev
           pip install Cython==0.29.33 buildozer
 
-      - name: Download Android SDK
-        run: |
-          mkdir -p $HOME/android-sdk/cmdline-tools
-          cd $HOME/android-sdk/cmdline-tools
-          wget https://dl.google.com/android/repository/commandlinetools-linux-11076708_latest.zip
-          unzip commandlinetools-linux-11076708_latest.zip
-          mv cmdline-tools latest
+      - name: Setup Android SDK
+        uses: android-actions/setup-android@v3
 
-      - name: Accept Licenses & Install Build-Tools 37
+      - name: Install Build-Tools & Accept Licenses
         run: |
-          export ANDROID_HOME=$HOME/android-sdk
-          export PATH=$PATH:$ANDROID_HOME/cmdline-tools/latest/bin
           yes | sdkmanager --licenses
           sdkmanager "platforms;android-33" "build-tools;37.0.0" "platform-tools"
 
-      - name: Force Buildozer to Use Our SDK
-        run: |
-          echo "android.sdk_path = $HOME/android-sdk" >> buildozer.spec
-
       - name: Build APK
         run: |
-          export ANDROID_HOME=$HOME/android-sdk
+          export ANDROID_SDK_ROOT=$ANDROID_HOME
+          export PATH=$PATH:$ANDROID_HOME/cmdline-tools/latest/bin:$ANDROID_HOME/platform-tools
           buildozer android debug
           
       - name: Upload APK
