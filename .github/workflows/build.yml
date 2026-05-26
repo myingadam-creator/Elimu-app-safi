@@ -4,7 +4,7 @@ on:
 
 jobs:
   build:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     
     steps:
       - uses: actions/checkout@v4
@@ -17,10 +17,11 @@ jobs:
 
       - name: Setup Android SDK
         uses: android-actions/setup-android@v3
-        with:
-          cmdline-tools-version: 11076708
-          packages: platforms;android-33 build-tools;37.0.0 platform-tools
-          accept-android-sdk-licenses: true
+
+      - name: Install Build-Tools 37
+        run: |
+          yes | sdkmanager --licenses
+          sdkmanager "build-tools;37.0.0" "platforms;android-33"
 
       - name: Setup Python
         uses: actions/setup-python@v5
@@ -33,10 +34,8 @@ jobs:
           sudo apt install -y python3-pip git zip unzip autoconf libtool pkg-config zlib1g-dev libncurses5-dev libncursesw5-dev cmake libffi-dev libssl-dev
           pip install Cython==0.29.33 buildozer
 
-      - name: Build with Buildozer
-        run: |
-          export ANDROID_SDK_ROOT=$ANDROID_HOME
-          buildozer android debug
+      - name: Build APK
+        run: buildozer android debug
           
       - name: Upload APK
         uses: actions/upload-artifact@v4
