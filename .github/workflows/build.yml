@@ -7,17 +7,17 @@ jobs:
     runs-on: ubuntu-22.04
     
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout
+        uses: actions/checkout@v4
 
-      - name: Build with Buildozer Action
-        uses: ArtemSBulgakov/buildozer-action@v1
-        id: buildozer
+      - name: Build with Buildozer
+        uses: digreat007/buildozer-action@v2
         with:
-          workdir: .
-          buildozer_version: stable
+          python-version: '3.10'
+          buildozer-cmd: buildozer android debug
 
-      - name: Upload artifacts
+      - name: Upload APK
         uses: actions/upload-artifact@v4
         with:
           name: ElimuYetApp-APK
-          path: ${{ steps.buildozer.outputs.filename }}
+          path: bin/*.apk
